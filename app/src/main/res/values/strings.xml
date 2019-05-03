@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Pop Movies</string>
+
+    <string name="action_popular">Pupular Movies</string>
+    <string name="action_topRated">Top Rated Movies</string>
+    <string name="error_msg">
+        An error has occurred. Please try again.
+    </string>
+
+    <string name="title_activity_detail">Movie Detail</string>
+    <string name="movie_title">MOVIE TITLE</string>
+    <string name="_2015">2015</string>
+    <string name="language_en">Language : EN</string>
+    <string name="_8_1_10">8.1/10</string>
+    <string name="mark_as_favorite">Mark as favorite</string>
+    <string name="todo">TODO</string>
+</resources>
