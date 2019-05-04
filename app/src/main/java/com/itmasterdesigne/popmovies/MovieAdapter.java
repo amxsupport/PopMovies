@@ -59,6 +59,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         Picasso.get().load(popMovie.getmImageUrl()).error(R.mipmap.ic_launcher)
                 .placeholder(R.mipmap.ic_launcher).into(movieAdapterViewHolder.mMovieImageView);
+        Picasso.get().setLoggingEnabled(true);
 
     }
 

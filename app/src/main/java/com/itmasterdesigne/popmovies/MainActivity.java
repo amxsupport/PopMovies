@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import com.itmasterdesigne.popmovies.Models.Movie;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
@@ -26,7 +28,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapetr;
     private TextView mErrorMessageDisplay;
-    private ProgressBar mProgressbareIndicator;
     private static final String POPULAR_MOVIE = "popular";
     private static final String TOP_RATED_MOVIE = "top_rated";
 
@@ -47,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mMovieAdapetr = new MovieAdapter(this);
         mRecyclerView.setAdapter(mMovieAdapetr);
 
-        mProgressbareIndicator = (ProgressBar)findViewById(R.id.pb_loading_indicator);
 
             loadMovieData(POPULAR_MOVIE);
 
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void loadMovieData(String SortedBy){
         showMovieDataView();
-        new FetchMovieTask().execute(SortedBy);
+        new FetchMovieTask(this).execute(SortedBy);
     }
 
     private void showMovieDataView(){
@@ -77,7 +77,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
-    private class FetchMovieTask extends AsyncTask<String,Void, Movie[]>{
+    private static class FetchMovieTask extends AsyncTask<String,Void, Movie[]>{
+
+        private WeakReference<MainActivity> activityReference;
+
+        // only retain a weak reference to the activity
+        FetchMovieTask(MainActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
 
         @Override
         protected Movie[] doInBackground(String... strings) {
@@ -102,18 +109,25 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            MainActivity activity = activityReference.get();
+            if (activity == null || activity.isFinishing()) return;
+
+            // modify the activity's UI
+            ProgressBar mProgressbareIndicator = activity.findViewById(R.id.pb_loading_indicator);
             mProgressbareIndicator.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(Movie[] movies) {
-
+            MainActivity activity = activityReference.get();
+            if (activity == null || activity.isFinishing()) return;
+            ProgressBar mProgressbareIndicator = activity.findViewById(R.id.pb_loading_indicator);
             mProgressbareIndicator.setVisibility(View.INVISIBLE);
             if(movies != null){
-                showMovieDataView();
-                mMovieAdapetr.setmListMovie(movies);
+                activity.showMovieDataView();
+                activity.mMovieAdapetr.setmListMovie(movies);
             }else {
-                showErrorMessage();
+                activity.showErrorMessage();
             }
 
         }
